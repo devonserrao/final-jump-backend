@@ -40,4 +40,14 @@ public class UserService {
 		return added;
 		
 	}
+	
+	public User checkUserInDb(String username, String password) {
+		User found = repo.loginUser(username, password);
+		
+		if(found != null) {
+			return found;
+		}
+		
+		return new User();
+	}
 }

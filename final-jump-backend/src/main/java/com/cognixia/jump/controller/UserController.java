@@ -1,6 +1,7 @@
 package com.cognixia.jump.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,23 @@ public class UserController {
 		
 		return ResponseEntity.status(201).body(added);
 		
+	}
+	
+	// Logging in User
+	@GetMapping("/user/login")
+	public User loginUser(@RequestBody Map<String, String> loginCredentials) throws ResourceNotFoundException {
+		
+		// get username and password from the Map
+		String inputUsername = loginCredentials.get("username");
+		String inputPassword = loginCredentials.get("password");
+		
+		User loggedIn = service.checkUserInDb(inputUsername, inputPassword);
+		
+		if(loggedIn.getId() == -1) {
+			throw new ResourceNotFoundException("No user with credentials [username = '" + inputUsername + "', password = '" + inputPassword + "'] found in DB!");
+		}
+		
+		return loggedIn;
 	}
 	
 }
