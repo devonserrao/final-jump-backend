@@ -13,6 +13,8 @@ import javax.persistence.Id;
 
 import com.sun.istack.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
+
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Makes sure our data loads fast enough without getting error of unable to serialize fast enough!
 @Entity
 public class Review implements Serializable {
@@ -21,21 +23,27 @@ public class Review implements Serializable {
 	
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
+	 @ApiModelProperty(notes = "The id the database will generate using auto incrementing for the review.")
 	 private Integer id;
 	
 	 @ManyToOne
 	 @JoinColumn(name = "user_id", referencedColumnName = "id")
+	 @ApiModelProperty(notes = "The user who created the review.")
 	 private User user;
 	
 	 @ManyToOne
 	 @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+	 @ApiModelProperty(notes = "The restaurant referenced in the review.")
 	 private Restaurant restaurant;
 	
 	 @NotNull
+	 @ApiModelProperty(notes = "The user's rating of the restaurant, from 1 to 5 stars.")
 	 private Integer rating;
 	
+	 @ApiModelProperty(notes = "An optional written review of the restaurant.")
 	 private String comment;
 	
+	 @ApiModelProperty(notes = "The date the review was created.")
 	 private LocalDate createdOn;
 	 
 	 public Review() {

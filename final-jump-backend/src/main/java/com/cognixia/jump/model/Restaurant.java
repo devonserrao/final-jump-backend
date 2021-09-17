@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
+
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Makes sure our data loads fast enough without getting error of unable to serialize fast enough!
 @Entity
 public class Restaurant implements Serializable {
@@ -23,21 +25,27 @@ public class Restaurant implements Serializable {
 	
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
+	 @ApiModelProperty(notes = "The id the database will generate using auto incrementing for the restaurant.")
 	 private Integer id;
 	
 	 @NotNull
+	 @ApiModelProperty(notes = "The name of the restaurant.")
 	 private String name;
 	
 	 @NotNull
+	 @ApiModelProperty(notes = "The restaurant's street address.")
 	 private String address;
 	
 	 @NotNull
+	 @ApiModelProperty(notes = "A description of the restaurant, including the type of food served and hours of operation.")
 	 private String description;
 	
 	 @NotNull // maybe can be null if we dont want a image for restaurant
+	 @ApiModelProperty(notes = "The URL of an uploaded image for the restaurant.")
 	 private String imageSrc;
 	
 	 @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+	 @ApiModelProperty(notes = "The restaurant's reviews, submitted by users.")
 	 private List<Review> reviews;
 	
 	 public Restaurant() {

@@ -17,6 +17,8 @@ import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.service.RestaurantService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RequestMapping("/api")
 @RestController
 public class RestaurantController {
@@ -24,11 +26,14 @@ public class RestaurantController {
 	@Autowired
 	RestaurantService service;
 	
+	@ApiOperation(value = "Get a list of all Restaurants, with their reviews.")
 	@GetMapping("/restaurant")
 	public List<Restaurant> getAllRestaurants() {
 		return service.getAllRestaurants();
 	}
 	
+	@ApiOperation(value = "Get a Restaurant by its ID", 
+			notes = "Pass in the Restaurant's ID in the URL.")
 	@GetMapping("/restaurant/{id}")
 	public Restaurant getRestaurantById(@PathVariable int id) throws ResourceNotFoundException {
 		
@@ -42,6 +47,8 @@ public class RestaurantController {
 	}
 	
 	// ADMIN ONLY - Add a restaurant
+	@ApiOperation(value = "Create a new Restaurant.", 
+			notes = "Pass in the Restaurant's name, address, description, and an image.")
 	@PostMapping("/restaurant")
 	public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
 		
@@ -52,6 +59,8 @@ public class RestaurantController {
 	}
 	
 	// ADMIN ONLY - Update a restaurant
+	@ApiOperation(value = "Update a Restaurant's information.", 
+			notes = "Pass in the Restaurant's new name, address, description, or image.")
 	@PutMapping("/restaurant")
 	public Restaurant updateRestaurant(@RequestBody Restaurant restaurant) throws ResourceNotFoundException {
 		
@@ -66,6 +75,8 @@ public class RestaurantController {
 	}
 	
 	// ADMIN ONLY - Delete a restaurant
+	@ApiOperation(value = "Delete a Restaurant using its ID", 
+			notes = "Pass in the Restaurant's ID in the URL.")
 	@DeleteMapping("/restaurant/{id}")
 	public Restaurant deleteRestaurant(@PathVariable int id) throws ResourceNotFoundException {
 		
@@ -75,10 +86,6 @@ public class RestaurantController {
 			throw new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB to DELETE.");
 		}
 		
-		return deleted;
-		
-	}
-	
-	
-	
+		return deleted;		
+	}	
 }
