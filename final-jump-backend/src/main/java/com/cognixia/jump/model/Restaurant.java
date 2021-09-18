@@ -116,7 +116,16 @@ public class Restaurant implements Serializable {
 				+ ", imageSrc=" + imageSrc + ", reviews=" + reviews + "]";
 	}
 	 
-	 
+	public String toJson() {
+
+		return "{\"id\" : " + id 
+				+ ", \"name\" : \"" + name 
+				+ "\"" + ", \"address\" : \"" + address 
+				+ "\"" + ", \"description\" : \"" + description
+				+ "\"" + ", \"imageSrc\" : \"" + imageSrc
+				+ "\"" + ", \"reviews\" : " + reviews
+			    + "}";
+	} 
 
  
 
