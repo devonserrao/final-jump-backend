@@ -16,8 +16,6 @@ import javax.persistence.Id;
 
 import com.sun.istack.NotNull;
 
-import io.swagger.annotations.ApiModelProperty;
-
 enum RoleType {
     CUSTOMER, ADMIN
 }
@@ -30,11 +28,9 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(notes = "The user's auto-incremented unique ID.")
     private Integer id;
 
     @NotNull
-    @ApiModelProperty(notes = "The user's name.")
     private String name;
 
     @NotNull
@@ -45,11 +41,9 @@ public class User implements Serializable {
     private String username;
     
     @NotNull
-    @ApiModelProperty(notes = "The user's password.")
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @ApiModelProperty(notes = "The reviews this user has created.")
     private List<Review> reviews;
 
     public User() {
