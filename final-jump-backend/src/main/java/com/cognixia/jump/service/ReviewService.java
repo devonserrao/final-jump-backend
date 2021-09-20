@@ -7,13 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cognixia.jump.model.Review;
+import com.cognixia.jump.repository.RestaurantRepository;
 import com.cognixia.jump.repository.ReviewRepository;
+import com.cognixia.jump.repository.UserRepository;
 
 @Service
 public class ReviewService {
 
 	@Autowired
 	ReviewRepository repo;
+	
+	@Autowired
+	RestaurantRepository restaurantRepo;
+	
+	@Autowired
+	UserRepository userRepo;
 	
 	public List<Review> getAllReviews() {
 		return repo.findAll();
@@ -35,8 +43,18 @@ public class ReviewService {
 		
 		review.setId(-1);
 		
-		Review added = repo.save(review);
-		return added;
+		// check to make sure both the Restaurant and User exist
+		int restaurantId = review.getRestaurant().getId();
+		boolean restaurantExists = restaurantRepo.existsById(restaurantId);
+		
+		int userId = review.getUser().getId();
+		boolean userExists = userRepo.existsById(userId);
+		
+		if(userExists && restaurantExists) {
+			Review added = repo.save(review);
+			return added;
+		}
+		return new Review();
 	}
 	
 	// TODO

@@ -37,7 +37,7 @@ public class SwaggerConfig {
 	
 	public ApiInfo apiDetails() {
 		
-		return new ApiInfo("Car API", // title of the documentation
+		return new ApiInfo("Restaurant Review API", // title of the documentation
 						  "Open source API for obtaining/updating car information.", // description
 						  "1.0", // version
 						  "Free to use", // terms of use

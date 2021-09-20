@@ -50,15 +50,17 @@ public class Review implements Serializable {
 	 private LocalDate createdOn;
 	 
 	 public Review() {
-	     this(-1, 0, "N/A", LocalDate.of(2021, 1, 1));
+	     this(-1, 0, "N/A", LocalDate.of(2021, 1, 1), new User(), new Restaurant());
 	 }
 	 
-	 public Review(Integer id, Integer rating, String comment, LocalDate createdOn) {
+	 public Review(Integer id, Integer rating, String comment, LocalDate createdOn, User user, Restaurant restaurant) {
 		super();
 		this.id = id;
 		this.rating = rating;
 		this.comment = comment;
 		this.createdOn = createdOn;
+		this.user = user;
+		this.restaurant = restaurant;
 	 }
 
 	public Integer getId() {
