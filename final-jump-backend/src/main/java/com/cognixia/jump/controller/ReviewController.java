@@ -75,7 +75,37 @@ public class ReviewController {
 	}
 	
 	// get reviews of a user
+	@GetMapping("/review/user/{id}")
+	public ResponseEntity<?> getReviewsByUserId(@PathVariable int id) throws ResourceNotFoundException {
+		List<Review> reviews = service.getReviewsOfUser(id);
+		
+		// if reviews is null, then the User does not exist
+		if(reviews == null) {
+			throw new ResourceNotFoundException("Error getting Reviews. The User with ID: " + id + " does not exist.");
+		}
+		// if reviews is empty, then the User has no reviews
+		if(reviews.isEmpty()) {
+			return ResponseEntity.status(204).body("The User with ID: " + id + " has no reviews.");
+		}
+		// the User was found, and has Reviews
+		return ResponseEntity.status(200).body(reviews);
+	}
 	
 	// get reviews of a restaurant
+	@GetMapping("/review/restaurant/{id}")
+	public ResponseEntity<?> getReviewsOfRestaurantId(@PathVariable int id) throws ResourceNotFoundException {
+		List<Review> reviews = service.getReviewsOfRestaurant(id);
+		
+		// if reviews is null, then the Restaurant does not exist
+		if(reviews == null) {
+			throw new ResourceNotFoundException("Error getting Reviews. The Restaurant with ID: " + id + " does not exist.");
+		}
+		// if reviews is empty, then the Restaurant has no reviews
+		if(reviews.isEmpty()) {
+			return ResponseEntity.status(204).body("The Restaurant with ID: " + id + " has no reviews.");
+		}
+		// the Restaurant was found, and has Reviews
+		return ResponseEntity.status(200).body(reviews);
+	}
 	
 }

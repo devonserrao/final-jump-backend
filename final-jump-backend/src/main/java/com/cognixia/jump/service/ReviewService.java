@@ -6,7 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.model.Review;
+import com.cognixia.jump.model.User;
 import com.cognixia.jump.repository.RestaurantRepository;
 import com.cognixia.jump.repository.ReviewRepository;
 import com.cognixia.jump.repository.UserRepository;
@@ -57,15 +59,29 @@ public class ReviewService {
 		return new Review();
 	}
 	
-	// TODO
-//	public List<Review> getReviewsOfUser(int userId) {
-//		
-//	}
+	public List<Review> getReviewsOfUser(int userId) {
+		// find the User with the given ID
+		Optional<User> user = userRepo.findById(userId);
+		
+		// if the User exists, return their reviews
+		if(user.isPresent()) {
+			return user.get().getReviews();
+		}
+		// the User does not exist, so return null
+		return null;
+	}
 	
-	// TODO
-//	public List<Review> getReviewsOfRestaurants(int restaurantId) {
-//		
-//	}
+	public List<Review> getReviewsOfRestaurant(int restaurantId) {
+		// find the Restaurant with the given ID
+		Optional<Restaurant> restaurant = restaurantRepo.findById(restaurantId);
+		
+		// if the Restaurant exists, return their reviews
+		if(restaurant.isPresent()) {
+			return restaurant.get().getReviews();
+		}
+		// the Restaurant does not exist, so return null
+		return null;
+	}
 	
 	
 	
