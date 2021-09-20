@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -28,11 +29,13 @@ public class Review implements Serializable {
 	
 	 @ManyToOne
 	 @JoinColumn(name = "user_id", referencedColumnName = "id")
+	 @JsonIgnoreProperties("reviews")
 	 @ApiModelProperty(notes = "The user who created the review.")
 	 private User user;
 	
 	 @ManyToOne
 	 @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+	 @JsonIgnoreProperties("reviews")
 	 @ApiModelProperty(notes = "The restaurant referenced in the review.")
 	 private Restaurant restaurant;
 	
