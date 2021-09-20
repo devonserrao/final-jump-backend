@@ -1,5 +1,6 @@
 package com.cognixia.jump.controller;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -12,6 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,24 +101,23 @@ public class RestaurantControllerTest {
 		
 	}
 	
-	// Issue => Returning 200 instead of 404
-//	@Test
-//	void testGetRestaurantNotFound() throws Exception, ResourceNotFoundException {
-//		
-//		int id = -1;
-//		String uri = STARTING_URI + "/restaurant/{id}";
-//		
-//		when( service.getRestaurantById(id) )
-//				.thenThrow(new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB."));
-//		
-//		mockMvc.perform( get(uri, id) )
-//				.andDo( print() )
-//				.andExpect( status().isNotFound() );
-//		
-//		verify(service, times(1)).getRestaurantById(id);
-//		verifyNoMoreInteractions(service);
-//		
-//	}
+	@Test
+	void testGetRestaurantNotFound() throws Exception {
+		
+		int id = -1;
+		String uri = STARTING_URI + "/restaurant/{id}";
+		
+		when( service.getRestaurantById(id) )
+				.thenThrow(new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB."));
+		
+		mockMvc.perform( get(uri, id) )
+				.andDo( print() )
+				.andExpect( status().isNotFound() );
+		
+		verify(service, times(1)).getRestaurantById(id);
+		verifyNoMoreInteractions(service);
+		
+	}
 	
 	@Test
 	void testCreateRestaurant() throws Exception {
@@ -153,23 +156,23 @@ public class RestaurantControllerTest {
 	}
 	
 	// Issue: Returns 200 instead of 404.
-//	@Test
-//	void testUpdateRestaurantNotFound() throws Exception {
-//		
-//		String uri = STARTING_URI + "/restaurant";
-//		
-//		Restaurant restaurantDoesntExist = new Restaurant(1000, "Tester's Diner", "98760 Cheshire Park, Austin, TX 64021", "Authentic southern American burgers and steaks. Dine-in available. Open Monday - Friday 10 am-11pm", "", new ArrayList<Review>() );
-//		
-//		when( service.updateRestaurant( Mockito.any(Restaurant.class) ))
-//			.thenThrow( new ResourceNotFoundException("Restaurant with id = " + restaurantDoesntExist.getId() + " was not found in DB to UPDATE.") );
-//		
-//		mockMvc.perform( put(uri)
-//							.content( restaurantDoesntExist.toJson() )
-//							.contentType(MediaType.APPLICATION_JSON_VALUE) ) // All PUT & POST must have MediaType.APPLICATION_JSON_VALUE [since they have a Request Body with JSON Object]
-//				.andDo( print() )
-//				.andExpect( status().isNotFound());
-//		
-//	}
+	@Test
+	void testUpdateRestaurantNotFound() throws Exception {
+		
+		String uri = STARTING_URI + "/restaurant";
+		
+		Restaurant restaurantDoesntExist = new Restaurant(1000, "Tester's Diner", "98760 Cheshire Park, Austin, TX 64021", "Authentic southern American burgers and steaks. Dine-in available. Open Monday - Friday 10 am-11pm", "", new ArrayList<Review>() );
+		
+		when( service.updateRestaurant( Mockito.any(Restaurant.class) ))
+			.thenThrow( new ResourceNotFoundException("Restaurant with id = " + restaurantDoesntExist.getId() + " was not found in DB to UPDATE.") );
+		
+		mockMvc.perform( put(uri)
+							.content( restaurantDoesntExist.toJson() )
+							.contentType(MediaType.APPLICATION_JSON_VALUE) ) // All PUT & POST must have MediaType.APPLICATION_JSON_VALUE [since they have a Request Body with JSON Object]
+				.andDo( print() )
+				.andExpect( status().isNotFound());
+		
+	}
 	
 	@Test
 	void testDeleteRestaurant() throws Exception {
@@ -187,21 +190,19 @@ public class RestaurantControllerTest {
 		
 	}
 	
-//	@Test
-//	void testDeleteRestaurantNotFound() throws Exception {
-//		
-//		int id = 1;
-//		String uri = STARTING_URI + "/restaurant/{id}";
-//		
-//		Restaurant restaurantNotFoundToDelete = new Restaurant(1000, "fake test restaurant", "98760 Cheshire Park, Austin, TX 64021", "Authentic southern American burgers and steaks. Dine-in available. Open Monday - Friday 10 am-11pm", "", new ArrayList<Review>() );
-//		
-//		when( service.deleteRestaurant(id) )
-//			.thenThrow( new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB to DELETE.") );
-//		
-//		mockMvc.perform( delete(uri, id) )
-//				.andDo( print() )
-//				.andExpect( status().isNotFound() );
-//		
-//	}
+	@Test
+	void testDeleteRestaurantNotFound() throws Exception {
+		
+		int id = 1000;
+		String uri = STARTING_URI + "/restaurant/{id}";
+		
+		when( service.deleteRestaurant(id) )
+			.thenThrow( new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB to DELETE.") );
+		
+		mockMvc.perform( delete(uri, id) )
+				.andDo( print() )
+				.andExpect( status().isNotFound() );
+		
+	}
 	
 }

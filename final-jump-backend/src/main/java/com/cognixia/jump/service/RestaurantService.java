@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.repository.RestaurantRepository;
 
@@ -21,7 +22,7 @@ public class RestaurantService {
 		return repo.findAll();
 	}
 	
-	public Restaurant getRestaurantById(int id) {
+	public Restaurant getRestaurantById(int id) throws ResourceNotFoundException {
 		
 		Optional<Restaurant> found = repo.findById(id);
 		
@@ -29,7 +30,7 @@ public class RestaurantService {
 			return found.get();
 		}
 		
-		return new Restaurant();		
+		throw new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB.");	
 		
 	}
 	
@@ -45,20 +46,21 @@ public class RestaurantService {
 	}
 	
 	// ADMIN PRIVILEGE - PutMapping
-	public Restaurant updateRestaurant(Restaurant restaurant) {
+	public Restaurant updateRestaurant(Restaurant restaurant) throws ResourceNotFoundException {
 		
 		Restaurant updated = new Restaurant();
 		
 		if( repo.existsById(restaurant.getId()) ) {
-			updated = repo.save(restaurant);			
+			updated = repo.save(restaurant);	
+			return updated;
 		}
 		
-		return updated;
+		throw new ResourceNotFoundException("Restaurant with id = " + restaurant.getId() + " was not found in DB to UPDATE.");
 		
 	}
 	
 	// ADMIN PRIVILEGE - DeleteMapping
-	public Restaurant deleteRestaurant(int id) {
+	public Restaurant deleteRestaurant(int id) throws ResourceNotFoundException {
 		
 		Restaurant deleted = new Restaurant();
 		
@@ -66,10 +68,11 @@ public class RestaurantService {
 			
 			deleted = repo.getById(id);
 			repo.deleteById(id);
+			return deleted;
 			
 		}
 
-		return deleted;
+		throw new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB to DELETE.");
 	}
 	
 }

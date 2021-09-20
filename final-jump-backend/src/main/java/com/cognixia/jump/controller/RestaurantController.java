@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 
 @RequestMapping("/api")
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 public class RestaurantController {
 
 	@Autowired
@@ -37,10 +39,13 @@ public class RestaurantController {
 	@GetMapping("/restaurant/{id}")
 	public Restaurant getRestaurantById(@PathVariable int id) throws ResourceNotFoundException {
 		
-		Restaurant restaurant = service.getRestaurantById(id);
-		
-		if(restaurant.getId() == -1) { 
-			throw new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB.");
+		Restaurant restaurant = null;
+		try 
+		{
+			restaurant = service.getRestaurantById(id);
+			
+		} catch(ResourceNotFoundException e) {
+			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
 		}
 		
 		return restaurant;
@@ -64,10 +69,13 @@ public class RestaurantController {
 	@PutMapping("/restaurant")
 	public Restaurant updateRestaurant(@RequestBody Restaurant restaurant) throws ResourceNotFoundException {
 		
-		Restaurant updated = service.updateRestaurant(restaurant);
+		Restaurant updated = null;
+		try {
 		
-		if(updated.getId() == -1) {
-			throw new ResourceNotFoundException("Restaurant with id = " + restaurant.getId() + " was not found in DB to UPDATE.");
+			updated = service.updateRestaurant(restaurant);
+		
+		} catch(ResourceNotFoundException e) {
+			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
 		}
 
 		return updated;
@@ -80,10 +88,13 @@ public class RestaurantController {
 	@DeleteMapping("/restaurant/{id}")
 	public Restaurant deleteRestaurant(@PathVariable int id) throws ResourceNotFoundException {
 		
-		Restaurant deleted = service.deleteRestaurant(id);
-		
-		if(deleted.getId() == -1) {
-			throw new ResourceNotFoundException("Restaurant with id = " + id + " was not found in DB to DELETE.");
+		Restaurant deleted = null;
+		try {
+			
+			deleted = service.deleteRestaurant(id);	
+			
+		} catch(ResourceNotFoundException e) {
+			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
 		}
 		
 		return deleted;		
