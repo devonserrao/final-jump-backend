@@ -190,8 +190,6 @@ public class UserControllerTest {
 		verify(service, times(1)).loginUser(username, password);
 		verifyNoMoreInteractions(service);
 		
-	}
-	
-	
+	}	
 	
 }

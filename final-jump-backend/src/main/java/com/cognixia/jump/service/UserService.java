@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cognixia.jump.exception.ResourceNotFoundException;
@@ -32,6 +35,16 @@ public class UserService {
 		
 	}
 	
+	public User getUserByUsername(String username) throws ResourceNotFoundException {
+		User found = repo.findByUsername(username);
+		
+		if(found != null) {
+			return found;
+		}
+		
+		throw new ResourceNotFoundException("User with username = " + username + " was not found in DB.");	
+	}
+	
 	public User addUser(User user) {
 		
 		user.setId(-1);
@@ -51,4 +64,5 @@ public class UserService {
 		
 		throw new ResourceNotFoundException("No user with credentials [username = '" + username + "', password = '" + password + "'] found in DB!");
 	}
+	
 }

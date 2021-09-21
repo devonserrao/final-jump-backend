@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.service.RestaurantService;
+import com.cognixia.jump.util.JwtUtil;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -24,6 +26,9 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
 public class RestaurantController {
+	
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	@Autowired
 	RestaurantService service;
@@ -45,7 +50,7 @@ public class RestaurantController {
 			restaurant = service.getRestaurantById(id);
 			
 		} catch(ResourceNotFoundException e) {
-			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
+			throw e; // Propagate the exception for GlobalExceptionHandler to recognize it.
 		}
 		
 		return restaurant;
@@ -55,7 +60,13 @@ public class RestaurantController {
 	@ApiOperation(value = "Create a new Restaurant.", 
 			notes = "Pass in the Restaurant's name, address, description, and an image.")
 	@PostMapping("/restaurant")
-	public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
+	public ResponseEntity<?> createRestaurant(@RequestBody Restaurant restaurant, 
+			@RequestHeader (name = "Authorization") String token) {
+		
+		// only Administrators should access this method
+		if(!isAdmin(token)) {
+			return ResponseEntity.status(403).body("You must have Administrator access to create a new Restaurant.");
+		}
 		
 		Restaurant added = service.addRestaurant(restaurant);
 		
@@ -67,7 +78,13 @@ public class RestaurantController {
 	@ApiOperation(value = "Update a Restaurant's information.", 
 			notes = "Pass in the Restaurant's new name, address, description, or image.")
 	@PutMapping("/restaurant")
-	public Restaurant updateRestaurant(@RequestBody Restaurant restaurant) throws ResourceNotFoundException {
+	public ResponseEntity<?> updateRestaurant(@RequestBody Restaurant restaurant, 
+			@RequestHeader (name = "Authorization") String token) throws ResourceNotFoundException {
+		
+		// only Administrators should access this method
+		if(!isAdmin(token)) {
+			return ResponseEntity.status(403).body("You must have Administrator access to update a Restaurant.");
+		}
 		
 		Restaurant updated = null;
 		try {
@@ -75,10 +92,10 @@ public class RestaurantController {
 			updated = service.updateRestaurant(restaurant);
 		
 		} catch(ResourceNotFoundException e) {
-			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
+			throw e; // Propagate the exception for GlobalExceptionHandler to recognize it.
 		}
 
-		return updated;
+		return ResponseEntity.status(200).body(updated);
 		
 	}
 	
@@ -86,7 +103,13 @@ public class RestaurantController {
 	@ApiOperation(value = "Delete a Restaurant using its ID", 
 			notes = "Pass in the Restaurant's ID in the URL.")
 	@DeleteMapping("/restaurant/{id}")
-	public Restaurant deleteRestaurant(@PathVariable int id) throws ResourceNotFoundException {
+	public ResponseEntity<?> deleteRestaurant(@PathVariable int id, 
+			@RequestHeader (name = "Authorization") String token) throws ResourceNotFoundException {
+		
+		// only Administrators should access this method
+		if(!isAdmin(token)) {
+			return ResponseEntity.status(403).body("You must have Administrator access to delete a Restaurant.");
+		}
 		
 		Restaurant deleted = null;
 		try {
@@ -94,9 +117,16 @@ public class RestaurantController {
 			deleted = service.deleteRestaurant(id);	
 			
 		} catch(ResourceNotFoundException e) {
-			throw e; // Propogate the exception for GlobalExceptionHandler to recognize it.
+			throw e; // Propagate the exception for GlobalExceptionHandler to recognize it.
 		}
 		
-		return deleted;		
-	}	
+		return ResponseEntity.status(200).body(deleted);		
+	}
+	
+	private boolean isAdmin(String token) {
+		// extract the JWT from the header and remove the 'Bearer ' prefix
+		token = token.split(" ")[1];
+		// check if the token belongs to an Administrator
+		return jwtUtil.isAdmin(token);
+	}
 }
