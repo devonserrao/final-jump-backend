@@ -38,12 +38,12 @@ public class SwaggerConfig {
 	public ApiInfo apiDetails() {
 		
 		return new ApiInfo("Restaurant Review API", // title of the documentation
-						  "Open source API for obtaining/updating car information.", // description
+						  "Open source API for leaving reviews for a Restaurant.", // description
 						  "1.0", // version
 						  "Free to use", // terms of use
-						  new Contact("Orquidia", "http://github.com/notuntil4", "orquidia.moreno@cognixia.com"), // contact info
+						  new Contact("Devon Serrao", "http://github.com/devonserrao", "devonserrao@gmail.com"), // contact info						  
 						  "API License",  // license
-						  "http://github.com/notuntil4", // url to the license 
+						  "http://github.com/devonserrao", // url to the license 
 						  Collections.emptyList()); // list of vendors
 	}
 

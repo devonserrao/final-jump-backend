@@ -84,7 +84,8 @@ public class ReviewController {
 		return ResponseEntity.status(201).body(created);
 	}
 	
-	// get reviews of a user
+	@ApiOperation(value = "Retrieve all reviews created by a User", 
+			notes = "Pass in a User's ID in the URL")
 	@GetMapping("/review/user/{id}")
 	public ResponseEntity<?> getReviewsByUserId(@PathVariable int id) throws ResourceNotFoundException {
 		List<Review> reviews = null;
@@ -105,7 +106,8 @@ public class ReviewController {
 		return ResponseEntity.status(200).body(reviews);
 	}
 	
-	// get reviews of a restaurant
+	@ApiOperation(value = "Retrieve all reviews of a Restaurant", 
+			notes = "Pass in a Restaurant's ID in the URL")
 	@GetMapping("/review/restaurant/{id}")
 	public ResponseEntity<?> getReviewsOfRestaurantId(@PathVariable int id) throws ResourceNotFoundException {
 		List<Review> reviews = null;
