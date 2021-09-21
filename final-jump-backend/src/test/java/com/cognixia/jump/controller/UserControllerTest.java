@@ -32,6 +32,7 @@ import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Review;
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.service.UserService;
+import com.google.gson.Gson;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
@@ -138,12 +139,19 @@ public class UserControllerTest {
 		
 		User userExpectedToLogin = new User(2, "Nicholas", com.cognixia.jump.model.User.RoleType.ADMIN, "nc@gmail.com", "rootroot", new ArrayList<Review>());
 		
-		String json = "{\"username\": \"nc@gmail.com\", \"password\" : \"rootroot\"}";
+		//String json = "{\"username\": \"nc@gmail.com\", \"password\" : \"rootroot\"}";
+		
+		Map<String, String> credentials = new HashMap<String, String>();
+		credentials.put("username", "nc@gmail.com");
+		credentials.put("password", "rootroot");
+		
+		Gson gson = new Gson();		
 		
 		when( service.loginUser("nc@gmail.com", "rootroot") ).thenReturn(userExpectedToLogin);
 		
 		mockMvc.perform( get(uri)
-							.content( json ) )
+							.content(gson.toJson(credentials))
+							.contentType(MediaType.APPLICATION_JSON_VALUE) )
 				.andDo( print() )
 				.andExpect( status().isOk() )
 				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) )
@@ -155,7 +163,34 @@ public class UserControllerTest {
 				.andExpect( jsonPath("$.reviews").value(userExpectedToLogin.getReviews()) );
 	}
 	
-// testLoginUserFailed()
+	@Test
+	void testLoginUserFail() throws Exception {
+		
+		String uri = STARTING_URI + "/user/login";
+		
+		// login with bad credentials
+		String username = "nc@gmail.com";
+		String password = "rootroo";
+		
+		Map<String, String> badCredentials = new HashMap<String, String>();
+		badCredentials.put("username", username);
+		badCredentials.put("password", password); // this password is incorrect
+		
+		Gson gson = new Gson();
+		
+		when( service.loginUser(username, password) )
+			.thenThrow(new ResourceNotFoundException("No user with credentials [username = 'nc@gmail.com', password = 'rootroo'] found in DB!"));
+	
+		mockMvc.perform( get(uri)
+				.content(gson.toJson(badCredentials))
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andDo( print() )
+				.andExpect( status().isNotFound() );
+		
+		verify(service, times(1)).loginUser(username, password);
+		verifyNoMoreInteractions(service);
+		
+	}
 	
 	
 	
