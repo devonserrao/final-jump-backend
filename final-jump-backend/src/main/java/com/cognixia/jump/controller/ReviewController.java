@@ -35,10 +35,15 @@ public class ReviewController {
 	@GetMapping("/review/{id}")
 	public Review getReviewById(@PathVariable int id) throws ResourceNotFoundException {
 		
-		Review review = service.getReviewById(id);
+		Review review = null;
 		
-		if(review.getId() == -1)
-			throw new ResourceNotFoundException("Review with id = " + id + " was not found in DB.");
+		try {
+			review = service.getReviewById(id);
+			
+		} catch (ResourceNotFoundException e) {
+			
+			throw e;
+		}
 		
 		return review;
 	}
@@ -63,13 +68,16 @@ public class ReviewController {
 	@PostMapping("/review")
 	public ResponseEntity<Review> createReview(@RequestBody Review review) throws ResourceNotFoundException {
 		
-		Review created = service.addReview(review);
+		Review created = null;
 		
-		// if the returned Review's ID is -1, then either the Restaurant or User referenced don't exist
-		if(created.getId() == -1) {
-			// return an error
-			throw new ResourceNotFoundException("Error creating Review. The specified User or Restaurant don't exist.\n" + review.toString());
+		try {
+			created = service.addReview(review);
+		} catch (ResourceNotFoundException e) {
+			// if an Exception was thrown, the Review was not properly created
+			// propagate the exception so GlobalExceptionHandler can recognize it
+			throw e;
 		}
+		
 		// otherwise the operation was a success
 		return ResponseEntity.status(201).body(created);
 	}
@@ -77,12 +85,16 @@ public class ReviewController {
 	// get reviews of a user
 	@GetMapping("/review/user/{id}")
 	public ResponseEntity<?> getReviewsByUserId(@PathVariable int id) throws ResourceNotFoundException {
-		List<Review> reviews = service.getReviewsOfUser(id);
+		List<Review> reviews = null;
 		
-		// if reviews is null, then the User does not exist
-		if(reviews == null) {
-			throw new ResourceNotFoundException("Error getting Reviews. The User with ID: " + id + " does not exist.");
-		}
+		try {
+			reviews = service.getReviewsOfUser(id);
+		} catch (ResourceNotFoundException e) {
+			// if no User was found, then this will catch the Exception
+			// propagate it to the GlobalExceptionHandler
+			throw e;
+		}		
+		
 		// if reviews is empty, then the User has no reviews
 		if(reviews.isEmpty()) {
 			return ResponseEntity.status(204).body("The User with ID: " + id + " has no reviews.");
@@ -94,12 +106,17 @@ public class ReviewController {
 	// get reviews of a restaurant
 	@GetMapping("/review/restaurant/{id}")
 	public ResponseEntity<?> getReviewsOfRestaurantId(@PathVariable int id) throws ResourceNotFoundException {
-		List<Review> reviews = service.getReviewsOfRestaurant(id);
+		List<Review> reviews = null;
 		
-		// if reviews is null, then the Restaurant does not exist
-		if(reviews == null) {
-			throw new ResourceNotFoundException("Error getting Reviews. The Restaurant with ID: " + id + " does not exist.");
+		try {
+			reviews = service.getReviewsOfRestaurant(id);
+		} catch (ResourceNotFoundException e) {
+			// if no Restaurant was found, then this will catch the Exception
+			// the GlobalExceptionHandler will catch it and return a 404
+			throw e;
 		}
+		
+		
 		// if reviews is empty, then the Restaurant has no reviews
 		if(reviews.isEmpty()) {
 			return ResponseEntity.status(204).body("The Restaurant with ID: " + id + " has no reviews.");

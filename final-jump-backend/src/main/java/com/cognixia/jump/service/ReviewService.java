@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.model.Review;
 import com.cognixia.jump.model.User;
@@ -29,19 +30,19 @@ public class ReviewService {
 		return repo.findAll();
 	}
 	
-	public Review getReviewById(int id) {
+	public Review getReviewById(int id) throws ResourceNotFoundException {
 		
 		Optional<Review> found = repo.findById(id);
 		
-		if(found.isPresent()) {
-			return found.get();
+		// if the Review does not exist, throw an exception
+		if(!found.isPresent()) {
+			throw new ResourceNotFoundException("Review with id = " + id + " was not found in DB.");
 		}
-		
-		return new Review();
-		
+		// otherwise, return the Review
+		return found.get();
 	}
 	
-	public Review addReview(Review review) {
+	public Review addReview(Review review) throws ResourceNotFoundException {
 		
 		review.setId(-1);
 		
@@ -56,10 +57,11 @@ public class ReviewService {
 			Review added = repo.save(review);
 			return added;
 		}
-		return new Review();
+		// otherwise, throw an Exception
+		throw new ResourceNotFoundException("Error creating Review. The specified User or Restaurant don't exist.\n" + review.toString());
 	}
 	
-	public List<Review> getReviewsOfUser(int userId) {
+	public List<Review> getReviewsOfUser(int userId) throws ResourceNotFoundException {
 		// find the User with the given ID
 		Optional<User> user = userRepo.findById(userId);
 		
@@ -67,11 +69,11 @@ public class ReviewService {
 		if(user.isPresent()) {
 			return user.get().getReviews();
 		}
-		// the User does not exist, so return null
-		return null;
+		// the User does not exist, so throw an exception
+		throw new ResourceNotFoundException("Error getting Reviews. The User with ID: " + userId + " does not exist.");
 	}
 	
-	public List<Review> getReviewsOfRestaurant(int restaurantId) {
+	public List<Review> getReviewsOfRestaurant(int restaurantId) throws ResourceNotFoundException {
 		// find the Restaurant with the given ID
 		Optional<Restaurant> restaurant = restaurantRepo.findById(restaurantId);
 		
@@ -79,8 +81,8 @@ public class ReviewService {
 		if(restaurant.isPresent()) {
 			return restaurant.get().getReviews();
 		}
-		// the Restaurant does not exist, so return null
-		return null;
+		// the Restaurant does not exist, so throw an exception
+		throw new ResourceNotFoundException("Error getting Reviews. The Restaurant with ID: " + restaurantId + " does not exist.");
 	}
 	
 	
