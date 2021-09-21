@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import com.cognixia.jump.filter.JwtRequestFilter;
 
@@ -42,8 +45,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-		http.csrf().disable() // disable csrf (common security attack)
-			.authorizeRequests() 
+		http.cors().and()
+			.csrf().disable() // disable csrf (common security attack)
+			.authorizeRequests()
 			.antMatchers("/api/user/login").permitAll() // permit anyone with or w/o token to login
 			.antMatchers(HttpMethod.GET, "/api/user/**").permitAll() // let anyone see a list of users, or a user by ID
 			.antMatchers(HttpMethod.POST, "/api/user").permitAll() // anyone can make a new account
@@ -66,7 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		
 		return super.authenticationManagerBean();
 	}
-	
+
 	
 	
 }

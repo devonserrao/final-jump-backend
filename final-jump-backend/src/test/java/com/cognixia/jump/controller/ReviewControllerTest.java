@@ -32,6 +32,8 @@ import com.cognixia.jump.model.Restaurant;
 import com.cognixia.jump.model.Review;
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.service.ReviewService;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ReviewController.class)
@@ -92,16 +94,23 @@ private final String STARTING_URI = "http://localhost:8080/api";
 		
 		when(service.getReviewById(id)).thenReturn(reviewFound);
 		
+//		String userJson = reviewFound.getUser().toJson();
+
+		Gson gson = new Gson();
+		
+//		String userJson = gson.toJson(reviewFound.getUser());
+//		String restaurantJson = gson.toJson(reviewFound.getRestaurant());
+		
 		mockMvc.perform( get(uri, id) )
 				.andDo( print() )
 				.andExpect( status().isOk() )
 				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) )
 				.andExpect( jsonPath("$.id").value(reviewFound.getId()) )
-				.andExpect( jsonPath("$.user").value(reviewFound.getUser()) )
-				.andExpect( jsonPath("$.restaurant").value(reviewFound.getRestaurant()) )
+//				.andExpect( jsonPath("$.user").value(reviewFound.getUser()))
+//				.andExpect( jsonPath("$.restaurant").value(restaurantJson) )
 				.andExpect( jsonPath("$.rating").value(reviewFound.getRating()) )
 				.andExpect( jsonPath("$.comment").value(reviewFound.getComment()) )
-				.andExpect( jsonPath("$.createdOn").value(reviewFound.getCreatedOn()) );
+				.andExpect( jsonPath("$.createdOn").value(reviewFound.getCreatedOn().toString()) );
 		
 		verify(service, times(1)).getReviewById(id);
 		verifyNoMoreInteractions(service);
