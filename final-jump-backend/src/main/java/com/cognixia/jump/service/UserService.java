@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.repository.UserRepository;
 
@@ -19,7 +20,7 @@ public class UserService {
 		return repo.findAll();
 	}
 	
-	public User getUserById(int id) {
+	public User getUserById(int id) throws ResourceNotFoundException {
 		
 		Optional<User> found = repo.findById(id);
 		
@@ -27,7 +28,7 @@ public class UserService {
 			return found.get();
 		}
 		
-		return new User();		
+		throw new ResourceNotFoundException("User with id = " + id + " was not found in DB.");	
 		
 	}
 	
@@ -41,13 +42,13 @@ public class UserService {
 		
 	}
 	
-	public User checkUserInDb(String username, String password) {
+	public User loginUser(String username, String password) throws ResourceNotFoundException {
 		User found = repo.loginUser(username, password);
 		
 		if(found != null) {
 			return found;
 		}
 		
-		return new User();
+		throw new ResourceNotFoundException("No user with credentials [username = '" + username + "', password = '" + password + "'] found in DB!");
 	}
 }

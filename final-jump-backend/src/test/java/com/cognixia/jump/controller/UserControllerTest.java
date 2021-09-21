@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,11 +13,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,14 +28,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Review;
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.service.UserService;
-
-enum RoleType {
-	CUSTOMER, ADMIN
-}
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
@@ -53,10 +53,9 @@ public class UserControllerTest {
 	
 		String uri = STARTING_URI + "/user";
 		
-		// TODO -> enum RoleType issue
 		List<User> allUsers = Arrays.asList(
-//					new User(1, "Devon", com.cognixia.jump.model.User.RoleType.CUSTOMER, "devon123@gmail.com", "devtestpass", new ArrayList<Review>() ),
-//					new User(2, "Nicholas", TODO, "nc@gmail.com", "rootroot", new ArrayList<Review>() )
+					new User(1, "Devon", com.cognixia.jump.model.User.RoleType.CUSTOMER, "devon123@gmail.com", "devtestpass", new ArrayList<Review>() ),
+					new User(2, "Nicholas", com.cognixia.jump.model.User.RoleType.ADMIN, "nc@gmail.com", "rootroot", new ArrayList<Review>() )
 				);
 		
 		when(service.getAllUsers()).thenReturn(allUsers);
@@ -70,57 +69,93 @@ public class UserControllerTest {
 		
 	}
 	
-//	@Test
-//	void testGetUserById() throws Exception {
+	@Test
+	void testGetUserById() throws Exception {
 
-//		int id = 2;
-//		String uri = STARTING_URI + "/user/{id}";
-//		
-//		User userFound = new User(1, "Devon", TODO, "devon123@gmail.com", "devtestpass", new ArrayList<Review>() );
-//	
-//		when( service.getUserById(id) ).thenReturn(userFound);
-//		
-//		mockMvc.perform( get(uri, id) )
-//				.andDo( print() )
-//				.andExpect( status().isOk() )
-//				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) )
-//				.andExpect( jsonPath("$.id").value(userFound.getId()) )
-//				.andExpect( jsonPath("$.name").value(userFound.getName()) )
-//				.andExpect( jsonPath("$.role").value(userFound.getRole()) )
-//				.andExpect( jsonPath("$.username").value(userFound.getUsername()) )
-//				.andExpect( jsonPath("$.password").value(userFound.getPassword()) )
-//				.andExpect( jsonPath("$.reviews").value(userFound.getReviews()) );
-//		
-//		verify(service, times(1)).getUserById(id);
-//		verifyNoMoreInteractions(service);
+		int id = 1;
+		String uri = STARTING_URI + "/user/{id}";
+		
+		User userFound = new User(1, "Devon", com.cognixia.jump.model.User.RoleType.CUSTOMER, "devon123@gmail.com", "devtestpass", new ArrayList<Review>() );
 	
-//	}
-
-//	@Test
-//	void testCreateUser() throws Exception {
-//
-//		String uri = STARTING_URI + "/restaurant";
-//		
-//		User userToCreate = new User(-1, "Test User", TODO, "test username", "test password", new ArrayList<Review>());
-//		
-//		when( service.addUser( Mockito.any(User.class) )).thenReturn(userToCreate);
-//		
-//		mockMvc.perform( post(uri)
-//							.content( userToCreate.toJson())
-//							.contentType(MediaType.APPLICATION_JSON_VALUE) )
-//				.andDo( print() )
-//				.andExpect( status().isCreated() )
-//				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) );	
-//	
-//	}
-
-//	@Test
-//	void testLoginUser() throws Exception {
+		when( service.getUserById(id) ).thenReturn(userFound);
+		
+		mockMvc.perform( get(uri, id) )
+				.andDo( print() )
+				.andExpect( status().isOk() )
+				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) )
+				.andExpect( jsonPath("$.id").value(userFound.getId()) )
+				.andExpect( jsonPath("$.name").value(userFound.getName()) )
+				.andExpect( jsonPath("$.role").value(userFound.getRole().toString()) )
+				.andExpect( jsonPath("$.username").value(userFound.getUsername()) )
+				.andExpect( jsonPath("$.password").value(userFound.getPassword()) )
+				.andExpect( jsonPath("$.reviews").value(userFound.getReviews()) );
+		
+		verify(service, times(1)).getUserById(id);
+		verifyNoMoreInteractions(service);
 	
-//	}
+	}
+	
+	@Test
+	void testGetUserNotFound() throws Exception {
+		
+		int id = 1;
+		String uri = STARTING_URI + "/user/{id}";
+		
+		when( service.getUserById(id) )
+			.thenThrow(new ResourceNotFoundException("User with id = " + id + " was not found in DB."));
+		
+		mockMvc.perform( get(uri, id) )
+				.andDo( print() )
+				.andExpect( status().isNotFound() );
+		
+		verify(service, times(1)).getUserById(id);
+		verifyNoMoreInteractions(service);
+	}
+
+	@Test
+	void testCreateUser() throws Exception {
+
+		String uri = STARTING_URI + "/user";
+		
+		User userToCreate = new User(5, "Test customer", com.cognixia.jump.model.User.RoleType.CUSTOMER, "test username", "test password", new ArrayList<Review>());
+		
+		when( service.addUser( Mockito.any(User.class) )).thenReturn(userToCreate);
+		
+		mockMvc.perform( post(uri)
+							.content( userToCreate.toJson())
+							.contentType(MediaType.APPLICATION_JSON_VALUE) )
+				.andDo( print() )
+				.andExpect( status().isCreated() )
+				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) );	
+	
+	}
+
+	// returning 500 instead of 200
+	@Test
+	void testLoginUser() throws Exception {
+	
+		String uri = STARTING_URI + "/user/login";
+		
+		User userExpectedToLogin = new User(2, "Nicholas", com.cognixia.jump.model.User.RoleType.ADMIN, "nc@gmail.com", "rootroot", new ArrayList<Review>());
+		
+		String json = "{\"username\": \"nc@gmail.com\", \"password\" : \"rootroot\"}";
+		
+		when( service.loginUser("nc@gmail.com", "rootroot") ).thenReturn(userExpectedToLogin);
+		
+		mockMvc.perform( get(uri)
+							.content( json ) )
+				.andDo( print() )
+				.andExpect( status().isOk() )
+				.andExpect( content().contentType(MediaType.APPLICATION_JSON_VALUE) )
+				.andExpect( jsonPath("$.id").value(userExpectedToLogin.getId()) )
+				.andExpect( jsonPath("$.name").value(userExpectedToLogin.getName()) )
+				.andExpect( jsonPath("$.role").value(userExpectedToLogin.getRole().toString()) )
+				.andExpect( jsonPath("$.username").value(userExpectedToLogin.getUsername()) )
+				.andExpect( jsonPath("$.password").value(userExpectedToLogin.getPassword()) )
+				.andExpect( jsonPath("$.reviews").value(userExpectedToLogin.getReviews()) );
+	}
 	
 // testLoginUserFailed()
-// testGetUserNotFound()
 	
 	
 	

@@ -16,9 +16,6 @@ import javax.persistence.Id;
 
 import com.sun.istack.NotNull;
 
-enum RoleType {
-    CUSTOMER, ADMIN
-}
 
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Makes sure our data loads fast enough without getting error of unable to serialize fast enough!
 @Entity
@@ -26,6 +23,10 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public enum RoleType {
+        CUSTOMER, ADMIN
+    }
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -113,5 +114,16 @@ public class User implements Serializable {
 		return "User [id=" + id + ", name=" + name + ", role=" + role + ", username=" + username + ", password="
 				+ password + ", reviews=" + reviews + "]";
 	}
+	
+	public String toJson() {
+
+		return "{\"id\" : " + id 
+				+ ", \"name\" : \"" + name 
+				+ "\"" + ", \"role\" : \"" + role 
+				+ "\"" + ", \"username\" : \"" + username
+				+ "\"" + ", \"password\" : \"" + password
+				+ "\"" + ", \"reviews\" : " + reviews
+			    + "}";
+	} 
 
 }
