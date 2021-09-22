@@ -13,9 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import com.cognixia.jump.filter.JwtRequestFilter;
 
@@ -50,7 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 			.antMatchers("/api/user/login").permitAll() // permit anyone with or w/o token to login
 			.antMatchers(HttpMethod.GET, "/api/user/**").permitAll() // let anyone see a list of users, or a user by ID
-			.antMatchers(HttpMethod.POST, "/api/user").permitAll() // anyone can make a new account
+			.antMatchers(HttpMethod.POST, "/api/user/customer").permitAll() // anyone can make a new account
 			.antMatchers(HttpMethod.GET, "/api/review/**").permitAll() // let anyone see all reviews, or reviews by user or restaurant
 			.antMatchers(HttpMethod.GET, "/api/restaurant/**").permitAll() // let anyone see a list of restaurants
 			.anyRequest().authenticated() // everything else will need a JWT token

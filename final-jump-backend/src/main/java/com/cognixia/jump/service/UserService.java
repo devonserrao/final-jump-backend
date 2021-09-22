@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.User;
+import com.cognixia.jump.model.User.RoleType;
 import com.cognixia.jump.repository.UserRepository;
 
 @Service
@@ -45,14 +46,33 @@ public class UserService {
 		throw new ResourceNotFoundException("User with username = " + username + " was not found in DB.");	
 	}
 	
-	public User addUser(User user) {
+	public User addCustomer(User user) throws IllegalArgumentException {
 		
 		user.setId(-1);
+		user.setRole(RoleType.CUSTOMER);
 		
 		User added = repo.save(user);
 		
-		return added;
+		if(added != null) {
+			return added;
+		}
 		
+		throw new IllegalArgumentException("Failed to create new Customer account. Username " + user.getUsername() + " already in use.");
+		
+	}
+	
+	public User addAdmin(User user) throws IllegalArgumentException {
+		
+		user.setId(-1);
+		user.setRole(RoleType.ADMIN);
+		
+		User added = repo.save(user);
+		
+		if(added != null) {
+			return added;
+		}
+		
+		throw new IllegalArgumentException("Failed to create new Admin account. Username " + user.getUsername() + " already in use.");		
 	}
 	
 	public User loginUser(String username, String password) throws ResourceNotFoundException {

@@ -68,12 +68,40 @@ public class UserController {
 		return user;
 	}
 	
-	@ApiOperation(value = "Create a new User.", 
-			notes = "Pass in the User's name, username, password, and role.")
-	@PostMapping("/user")
-	public ResponseEntity<User> createUser(@RequestBody User user) {
+	@ApiOperation(value = "Create a new Customer account.", 
+			notes = "Pass in the User's name, username, password.")
+	@PostMapping("/user/customer")
+	public ResponseEntity<?> createCustomer(@RequestBody User user) {
 		
-		User added = service.addUser(user);
+		User added = null;
+		
+		try {
+			added = service.addCustomer(user);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(400).body(e.getMessage());
+		}
+		
+		return ResponseEntity.status(201).body(added);		
+	}
+	
+	@ApiOperation(value = "Create a new Admin account.", 
+			notes = "You must be signed in as an Admin. Pass in the User's name, username, password.")
+	@PostMapping("/user/admin")
+	public ResponseEntity<?> createAdmin(@RequestBody User user, 
+			@RequestHeader (name = "Authorization") String token) {
+		
+		// only Administrators should access this method
+		if(!isAdmin(token)) {
+			return ResponseEntity.status(403).body("You must have Administrator access to delete a Restaurant.");
+		}
+		
+		User added = null;
+				
+		try {
+			added = service.addAdmin(user);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(400).body(e.getMessage());
+		}
 		
 		return ResponseEntity.status(201).body(added);
 		
@@ -107,8 +135,15 @@ public class UserController {
 		final String jwt = jwtUtil.generateTokens(userDetails, userDetails.getRole());
 		
 		// return token
-		return ResponseEntity.status(200).body( new AuthenticationResponse(jwt) );
+		return ResponseEntity.status(200).body( new AuthenticationResponse(jwt, userDetails.getRole().toString()) );
 		
+	}
+	
+	private boolean isAdmin(String token) {
+		// extract the JWT from the header and remove the 'Bearer ' prefix
+		token = token.split(" ")[1];
+		// check if the token belongs to an Administrator
+		return jwtUtil.isAdmin(token);
 	}
 	
 }

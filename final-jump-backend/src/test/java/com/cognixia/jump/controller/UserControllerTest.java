@@ -120,7 +120,7 @@ public class UserControllerTest {
 		
 		User userToCreate = new User(5, "Test customer", com.cognixia.jump.model.User.RoleType.CUSTOMER, "test username", "test password", new ArrayList<Review>());
 		
-		when( service.addUser( Mockito.any(User.class) )).thenReturn(userToCreate);
+		when( service.addCustomer( Mockito.any(User.class) )).thenReturn(userToCreate);
 		
 		mockMvc.perform( post(uri)
 							.content( userToCreate.toJson())
